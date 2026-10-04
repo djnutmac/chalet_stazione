@@ -47,23 +47,15 @@ h1 small{font-size:inherit;font-weight:800;transition:opacity .4s}
 #logo{display:block;height:calc(var(--u)*16);width:auto;flex:none}
 #ct,#ph{font-weight:700;font-size:calc(var(--u)*2.6);line-height:1.5;white-space:nowrap;min-width:0}
 #ws{display:flex;gap:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*2.4);border-top:calc(var(--u)*.5) solid var(--red);background:var(--panel)}
-#wx,#ps{flex:1 1 0;min-width:0;align-self:center}
-#wg,#ps{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8) calc(var(--u)*1.4)}
+#wx{flex:1 1 0;min-width:0;align-self:center}
+#wg{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8) calc(var(--u)*1.4)}
 #wg{grid-auto-rows:calc(var(--u)*5.6)}
-#ps{grid-auto-rows:calc(var(--u)*6.6)}
 .wc{display:flex;align-items:center;gap:calc(var(--u)*1);min-width:0}
 .wi{width:calc(var(--u)*5);height:calc(var(--u)*5);flex:none}
 .wt{min-width:0}
 .wn{font-size:calc(var(--u)*1.9);font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
 .wd{font-size:calc(var(--u)*3);font-weight:800;line-height:1.1}
 #wcr{font-size:calc(var(--u)*1.4);color:var(--dim);margin-top:calc(var(--u)*.6)}
-.sg{box-sizing:border-box;display:flex;flex-direction:column;background:#fff;border:calc(var(--u)*.3) solid #1b1b1b;border-radius:calc(var(--u)*.8);overflow:hidden}
-.sn{flex:1;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:calc(var(--u)*2);color:#111;white-space:nowrap;padding:0 calc(var(--u)*.6)}
-.sb{flex:none;text-align:center;font-weight:800;font-size:calc(var(--u)*2.1);line-height:1.3;color:#fff;letter-spacing:.06em;background:#8a8a8a}
-.sb.ok{background:#1e8c3a}
-.sb.no{background:#c6111a}
-.ml{transition:opacity .4s}
-#ps.fade .ml{opacity:0}
 #clk{display:flex;justify-content:center;align-items:center;min-width:0}
 svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(44vw,94dvh);filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
 .wi>svg{display:block;width:100%;height:100%;filter:none}
@@ -76,7 +68,7 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   <h1><small id="lt">Partenze</small></h1>
   <div class="row head" id="hd"><span>Ora</span><span>Ritardo</span><span>Linea</span><span>Destinazione</span><span class="p">Binario</span></div>
   <div id="rows"></div>
-  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div><div id="ps"></div></div>
+  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div></div>
 </section>
 <section id="clk">
 <svg viewBox="-107 -107 214 214" aria-label="Orologio analogico">
@@ -224,19 +216,11 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <script>
-/* Meteo (Open-Meteo) e stato dei passi (passi.json) */
+/* Meteo (Open-Meteo) */
 (function(){
-  var LI=0,MAXORE=48;
   var CITIES=[['Tirano',46.215,10.170],['Poschiavo',46.326,10.058],['Passo Bernina',46.409,10.022],['Sankt Moritz',46.490,9.835]];
-  var PASSES=[
-    ['forcola',['Passo Forcola','Forcola Pass','Forcolapass']],
-    ['bernina',['Passo Bernina','Bernina Pass','Berninapass']],
-    ['maloja',['Passo Maloja','Maloja Pass','Malojapass']],
-    ['julier',['Passo Julier','Julier Pass','Julierpass']]];
-  var STAT={aperto:['APERTO','OPEN','OFFEN'],chiuso:['CHIUSO','CLOSED','GESPERRT'],nd:['\u2014','\u2014','\u2014']};
-  var CLS={aperto:'ok',chiuso:'no',nd:'nd'};
-  var state={},wxAt=0,wcs=[],sgs=[];
-  var wg=document.getElementById('wg'),ps=document.getElementById('ps');
+  var wxAt=0,wcs=[];
+  var wg=document.getElementById('wg');
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 
   /* icone meteo: SVG disegnate qui, nessuna libreria */
@@ -260,13 +244,7 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   /* costruzione delle caselle */
   CITIES.forEach(function(c,i){var cell=el('div','wc'),ic=el('div','wi'),t=el('div','wt'),d=el('div','wd','\u2014');
     ic.innerHTML=icon(3,true,i);t.appendChild(el('div','wn',c[0]));t.appendChild(d);cell.appendChild(ic);cell.appendChild(t);wg.appendChild(cell);wcs.push({ic:ic,d:d})});
-  PASSES.forEach(function(p){var s=el('div','sg'),n=el('div','sn ml'),b=el('div','sb ml');s.appendChild(n);s.appendChild(b);ps.appendChild(s);sgs.push({k:p[0],names:p[1],n:n,b:b})});
 
-  function paintPassi(){sgs.forEach(function(g){var st=state[g.k]||'nd';
-    g.n.textContent=g.names[LI];g.b.textContent=STAT[st][LI];g.b.className='sb ml '+CLS[st]})}
-  paintPassi();
-  document.addEventListener('mlout',function(){ps.classList.add('fade')});
-  document.addEventListener('mlin',function(e){LI=e.detail;paintPassi();ps.classList.remove('fade')});
 
   /* meteo: Open-Meteo, ogni 15 minuti */
   var WURL='https://api.open-meteo.com/v1/forecast?latitude='+CITIES.map(function(c){return c[1]}).join(',')+'&longitude='+CITIES.map(function(c){return c[2]}).join(',')+'&current_weather=true&timezone=Europe%2FRome';
@@ -282,21 +260,9 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   /* se il meteo non si aggiorna da 3 ore, meglio non mostrare valori vecchi */
   setInterval(function(){if(wxAt&&Date.now()-wxAt>3*3600000){wcs.forEach(function(w){w.d.textContent='\u2014'});wxAt=0}},60000);
 
-  /* passi: passi.json, ogni 10 minuti; dati piu' vecchi di MAXORE ore o assenti = "\u2014" */
-  function loadPassi(){
-    fetch('passi.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){
-      if(!j)return;
-      var t=Date.parse(String(j.aggiornato||'').replace(' ','T')),
-          fresh=!isNaN(t)&&Date.now()-t<=MAXORE*3600000&&t-Date.now()<12*3600000;
-      state={};
-      PASSES.forEach(function(p){var v=fresh&&j.passi?String(j.passi[p[0]]||'').toLowerCase():'';
-        state[p[0]]=(v==='aperto'||v==='chiuso')?v:'nd'});
-      paintPassi();
-    }).catch(function(){});
-  }
-  loadWx();loadPassi();
-  setInterval(loadWx,15*60000);setInterval(loadPassi,10*60000);
-  document.addEventListener('visibilitychange',function(){if(!document.hidden){loadWx();loadPassi()}});
+  loadWx();
+  setInterval(loadWx,15*60000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)loadWx()});
 })();
 </script>
 <script>
