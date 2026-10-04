@@ -1,0 +1,10 @@
+{
+ "_istruzioni": "Per aggiornare: cambia 'aggiornato' con data e ora attuali nel formato 2026-10-04T18:00:00+02:00 e scrivi 'aperto' o 'chiuso' per ogni passo. Se la data ha piu di 48 ore, o e vuota, il tabellone mostra un trattino al posto di aperto/chiuso.",
+ "aggiornato": "",
+ "passi": {
+  "forcola": "aperto",
+  "bernina": "aperto",
+  "maloja": "aperto",
+  "julier": "aperto"
+ }
+}
