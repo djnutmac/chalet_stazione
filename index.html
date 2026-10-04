@@ -205,5 +205,25 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
 })();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<script>
+/* Aggiornamento automatico: ogni 30 minuti (e quando il tablet si risveglia) controlla se index.html online e' cambiato; se si', ricarica la pagina. */
+(function(){
+  var base=null;
+  function hash(t){var x=0,i;for(i=0;i<t.length;i++){x=(x*31+t.charCodeAt(i))|0}return x}
+  function check(){
+    fetch('index.html?v='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.ok?r.text():null})
+      .then(function(t){
+        if(!t)return;
+        var k=hash(t);
+        if(base===null){base=k;return}
+        if(k!==base)location.reload();
+      }).catch(function(){});
+  }
+  check();
+  setInterval(check,30*60*1000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
+})();
+</script>
 </body>
 </html>
