@@ -247,13 +247,13 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
 
 
   /* meteo: Open-Meteo, ogni 15 minuti */
-  var WURL='https://api.open-meteo.com/v1/forecast?latitude='+CITIES.map(function(c){return c[1]}).join(',')+'&longitude='+CITIES.map(function(c){return c[2]}).join(',')+'&current_weather=true&timezone=Europe%2FRome';
+  var WURL='https://api.open-meteo.com/v1/forecast?latitude='+CITIES.map(function(c){return c[1]}).join(',')+'&longitude='+CITIES.map(function(c){return c[2]}).join(',')+'&current=temperature_2m,weather_code,is_day&timezone=Europe%2FRome';
   function loadWx(){
     fetch(WURL,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
       var a=Array.isArray(j)?j:[j];
-      CITIES.forEach(function(c,i){var w=a[i]&&a[i].current_weather;if(!w)return;
-        wcs[i].d.textContent=Math.round(w.temperature)+'\u00b0';
-        wcs[i].ic.innerHTML=icon(w.weathercode,w.is_day!==0,i)});
+      CITIES.forEach(function(c,i){var w=a[i]&&a[i].current;if(!w||w.temperature_2m==null)return;
+        wcs[i].d.textContent=Math.round(w.temperature_2m)+'\u00b0';
+        wcs[i].ic.innerHTML=icon(w.weather_code,w.is_day!==0,i)});
       wxAt=Date.now();
     }).catch(function(){});
   }
