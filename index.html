@@ -146,8 +146,9 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
       gone=now>=t+10000;
       if(gone!==r.classList.contains('gone')){r.classList.toggle('gone',gone);changed=true}
       if(gone){r.classList.remove('soon');continue}
-      if(first){first=false;
-        if(t-now<=5*60000)r.classList.add('soon');else r.classList.remove('soon');
+      if(t-now<=5*60000){
+        /* ogni riga entro 5 minuti dalla partenza lampeggia; il ritardo negativo mette tutte in fase */
+        if(!r.classList.contains('soon')){r.style.animationDelay='-'+(now%1600)+'ms';r.classList.add('soon')}
       }else r.classList.remove('soon');
     }
     if(changed)refit();
