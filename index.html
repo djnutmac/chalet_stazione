@@ -32,14 +32,14 @@ h1 small{font-size:inherit;font-weight:800;transition:opacity .4s}
 .to{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .p{text-align:right;font-weight:800}
 .row.head>*{font-weight:800;font-size:inherit;letter-spacing:inherit}
-@keyframes soon{0%,100%{background-color:rgba(255,204,0,0)}50%{background-color:rgba(255,204,0,.95)}}
+@keyframes soon{0%,100%{background-color:rgba(128,227,154,0)}50%{background-color:#80e39a}}
 .row.gone{display:none!important}
 .row.bus{background-color:#ffcc00}
 .row.bus>*{color:#000}
-@keyframes soonbus{0%,100%{background-color:#ffcc00}50%{background-color:#fff}}
+@keyframes soonbus{0%,100%{background-color:#ffcc00}50%{background-color:#34c768}}
 .row.bus.soon{animation:soonbus 1.6s ease-in-out infinite}
 .row.soon{animation:soon 1.6s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.row.soon,.row.bus.soon{animation:none;background-color:#ffcc00}}
+@media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
 #rows.stretch{display:flex;flex-direction:column}
 #rows.stretch>.row{box-sizing:border-box;flex:1 0 auto;max-height:calc(var(--u)*5.2)}
 #rows{flex:1;overflow:hidden;position:relative}
