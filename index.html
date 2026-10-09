@@ -46,20 +46,23 @@ h1 small{font-size:inherit;font-weight:800;transition:opacity .4s}
 #qr{width:calc(var(--u)*13);height:calc(var(--u)*13);flex:none;display:block;border-radius:calc(var(--u)*.6)}
 #logo{display:block;height:calc(var(--u)*16);width:auto;flex:none}
 #ct,#ph{font-weight:700;font-size:calc(var(--u)*2.6);line-height:1.5;white-space:nowrap;min-width:0}
-#ws{display:flex;gap:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*2.4);border-top:calc(var(--u)*.5) solid var(--red);background:var(--panel)}
+#ws{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*2.4);border-top:calc(var(--u)*.5) solid var(--red);background:var(--panel)}
 #wx{flex:1 1 0;min-width:0;align-self:center}
-#wg{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8) calc(var(--u)*1.4)}
-#wg{grid-auto-rows:calc(var(--u)*5.6)}
-.wc{display:flex;align-items:center;gap:calc(var(--u)*1);min-width:0}
-.wi{width:calc(var(--u)*5);height:calc(var(--u)*5);flex:none}
-.wt{min-width:0}
-.wn{font-size:calc(var(--u)*1.9);font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
-.wd{font-size:calc(var(--u)*3);font-weight:800;line-height:1.1}
-#wcr{font-size:calc(var(--u)*1.4);color:var(--dim);margin-top:calc(var(--u)*.6)}
+#wg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*1)}
+.wc{display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--u)*.3);min-width:0}
+.wr{display:flex;align-items:center;gap:calc(var(--u)*.8)}
+.wi{width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);flex:none}
+.wn{font-size:calc(var(--u)*1.6);font-weight:700;color:var(--dim);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.wd{font-size:calc(var(--u)*3);font-weight:800;line-height:1.1;white-space:nowrap}
+#wcr{font-size:calc(var(--u)*1.3);color:var(--dim);margin-top:calc(var(--u)*.6)}
+#sc{flex:none;display:flex;align-items:center;gap:calc(var(--u)*1.5)}
+#st{width:calc(var(--u)*24);text-align:right;font-weight:800;font-size:calc(var(--u)*1.8);line-height:1.25;text-transform:uppercase;letter-spacing:.02em;color:var(--txt);text-wrap:balance;transition:opacity .4s}
+#st.fade{opacity:0}
+#sq{width:calc(var(--u)*12);height:calc(var(--u)*12);flex:none;display:block;filter:none;border-radius:calc(var(--u)*.6)}
 #clk{display:flex;justify-content:center;align-items:center;min-width:0}
 svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(44vw,94dvh);filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
 .wi>svg{display:block;width:100%;height:100%;filter:none}
-@media (max-width:800px) and (orientation:portrait){body{grid-template-columns:1fr;grid-template-rows:auto auto;padding-top:calc(2vh + env(safe-area-inset-top,0px));height:auto;min-height:100%}#board{height:auto;min-height:60vh}#board>*{--u:1cqw;--cols:calc(var(--u)*12) calc(var(--u)*19) calc(var(--u)*16) 1fr calc(var(--u)*15)}svg{width:90vw;height:90vw}.row{font-size:calc(var(--u)*4.2)}.row.head{font-size:calc(var(--u)*2.7)}#ws{flex-direction:column;gap:calc(var(--u)*2)}}
+@media (max-width:800px) and (orientation:portrait){body{grid-template-columns:1fr;grid-template-rows:auto auto;padding-top:calc(2vh + env(safe-area-inset-top,0px));height:auto;min-height:100%}#board{height:auto;min-height:60vh}#board>*{--u:1cqw;--cols:calc(var(--u)*12) calc(var(--u)*19) calc(var(--u)*16) 1fr calc(var(--u)*15)}svg{width:90vw;height:90vw}.row{font-size:calc(var(--u)*4.2)}.row.head{font-size:calc(var(--u)*2.7)}#ws{flex-direction:column;align-items:stretch;gap:calc(var(--u)*2)}#wg{grid-template-columns:repeat(2,minmax(0,1fr))}#sc{justify-content:flex-end}#st{width:auto;flex:1}}
 </style>
 </head>
 <body>
@@ -68,7 +71,7 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   <h1><small id="lt">Partenze</small></h1>
   <div class="row head" id="hd"><span>Ora</span><span>Ritardo</span><span>Linea</span><span>Destinazione</span><span class="p">Binario</span></div>
   <div id="rows"></div>
-  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div></div>
+  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div><div id="sc"><div id="st">SCANNERIZZA IL CODICE PER AVERE QUESTO ORARIO SUL TUO TELEFONINO</div><svg id="sq" shape-rendering="crispEdges" role="img" aria-label="QR code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path fill="#fff" d="M0 0h37v37h-37z"/><path stroke="#000" d="M2 2.5h7m3 0h4m1 0h1m5 0h2m3 0h7m-33 1h1m5 0h1m1 0h3m3 0h4m1 0h2m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m4 0h1m5 0h3m1 0h1m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h2m2 0h3m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m4 0h3m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m3 0h1m2 0h2m5 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h2m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m-22 1h1m1 0h4m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m5 0h2m1 0h2m1 0h1m-32 1h3m1 0h2m2 0h2m4 0h1m3 0h2m1 0h3m4 0h3m-29 1h3m1 0h1m1 0h2m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h5m-33 1h1m4 0h1m2 0h1m7 0h2m2 0h1m1 0h2m3 0h1m2 0h2m-28 1h4m1 0h1m1 0h1m2 0h7m2 0h1m2 0h2m3 0h1m-32 1h2m5 0h2m1 0h1m2 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h1m-30 1h4m1 0h6m2 0h1m1 0h8m3 0h1m1 0h2m-29 1h4m2 0h1m2 0h3m2 0h1m1 0h1m1 0h1m3 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m4 0h2m6 0h2m1 0h1m2 0h1m2 0h2m1 0h5m-30 1h3m1 0h1m4 0h1m8 0h5m3 0h1m1 0h1m1 0h1m1 0h1m-31 1h1m1 0h1m1 0h1m6 0h1m1 0h1m2 0h2m1 0h4m1 0h2m1 0h2m1 0h1m-30 1h2m2 0h3m1 0h1m1 0h4m1 0h3m1 0h2m2 0h1m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m1 0h1m1 0h1m5 0h1m3 0h1m1 0h1m2 0h1m-33 1h1m2 0h1m1 0h1m1 0h2m2 0h3m2 0h1m2 0h2m1 0h2m1 0h1m1 0h3m-30 1h1m1 0h6m2 0h5m2 0h1m5 0h1m1 0h3m3 0h2m-33 1h1m3 0h1m3 0h1m2 0h1m1 0h3m2 0h1m1 0h1m9 0h3m-33 1h3m3 0h1m2 0h1m3 0h5m1 0h2m1 0h1m1 0h6m1 0h1m-24 1h1m2 0h2m1 0h2m1 0h1m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m4 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h2m3 0h3m-31 1h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h4m1 0h1m1 0h7m3 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h2m2 0h5m1 0h1m1 0h1m1 0h2m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h2m1 0h3m2 0h3m2 0h1m1 0h1m1 0h2m2 0h2m-33 1h1m5 0h1m1 0h1m1 0h1m1 0h4m7 0h2m1 0h7m-33 1h7m4 0h1m1 0h1m3 0h2m4 0h3m1 0h2"/></svg></div></div>
 </section>
 <section id="clk">
 <svg viewBox="-107 -107 214 214" aria-label="Orologio analogico">
@@ -243,9 +246,13 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
     return '<svg viewBox="0 0 48 48" aria-hidden="true">'+g+'</svg>'}
 
   /* costruzione delle caselle */
-  CITIES.forEach(function(c,i){var cell=el('div','wc'),ic=el('div','wi'),t=el('div','wt'),d=el('div','wd','\u2014');
-    ic.innerHTML=icon(3,true,i);t.appendChild(el('div','wn',c[0]));t.appendChild(d);cell.appendChild(ic);cell.appendChild(t);wg.appendChild(cell);wcs.push({ic:ic,d:d})});
+  CITIES.forEach(function(c,i){var cell=el('div','wc'),row=el('div','wr'),ic=el('div','wi'),d=el('div','wd','\u2014');
+    ic.innerHTML=icon(3,true,i);cell.appendChild(el('div','wn',c[0]));row.appendChild(ic);row.appendChild(d);cell.appendChild(row);wg.appendChild(cell);wcs.push({ic:ic,d:d})});
 
+  /* testo del QR: segue la rotazione IT/EN/DE delle intestazioni */
+  var QT=['SCANNERIZZA IL CODICE PER AVERE QUESTO ORARIO SUL TUO TELEFONINO','SCAN THE CODE TO GET THIS TIMETABLE ON YOUR PHONE','SCANNE DEN CODE, UM DIESEN FAHRPLAN AUF DEINEM HANDY ZU HABEN'],st=document.getElementById('st');
+  document.addEventListener('mlout',function(){st.classList.add('fade')});
+  document.addEventListener('mlin',function(e){st.textContent=QT[e.detail];st.classList.remove('fade')});
 
   /* meteo: Open-Meteo, ogni 15 minuti */
   var WURL='https://api.open-meteo.com/v1/forecast?latitude='+CITIES.map(function(c){return c[1]}).join(',')+'&longitude='+CITIES.map(function(c){return c[2]}).join(',')+'&current=temperature_2m,weather_code,is_day&timezone=Europe%2FRome';
