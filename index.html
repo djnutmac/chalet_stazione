@@ -39,6 +39,7 @@ h1 small{font-size:inherit;font-weight:800;transition:opacity .4s}
 @keyframes soonbus{0%,100%{background-color:#ffcc00}50%{background-color:#34c768}}
 .row.bus.soon{animation:soonbus 1.6s ease-in-out infinite}
 .row.soon{animation:soon 1.6s ease-in-out infinite}
+html.lite *{box-shadow:none!important}html.lite svg{filter:none!important}html.lite .row.soon{animation-timing-function:steps(1,end)}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
 #rows.stretch{display:flex;flex-direction:column}
 #rows.stretch>.row{box-sizing:border-box;flex:1 0 auto;max-height:calc(var(--u)*5.2)}
@@ -71,7 +72,7 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   <h1><small id="lt">Partenze</small></h1>
   <div class="row head" id="hd"><span>Ora</span><span>Ritardo</span><span>Linea</span><span>Destinazione</span><span class="p">Binario</span></div>
   <div id="rows"></div>
-  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div><div id="sc"><div id="st">SCANNERIZZA IL CODICE PER AVERE QUESTO ORARIO SUL TUO TELEFONO</div><svg id="sq" shape-rendering="crispEdges" role="img" aria-label="QR code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path fill="#fff" d="M0 0h37v37h-37z"/><path stroke="#000" d="M2 2.5h7m3 0h4m1 0h1m5 0h2m3 0h7m-33 1h1m5 0h1m1 0h3m3 0h4m1 0h2m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m4 0h1m5 0h3m1 0h1m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h2m2 0h3m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m4 0h3m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m3 0h1m2 0h2m5 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h2m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m-22 1h1m1 0h4m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m5 0h2m1 0h2m1 0h1m-32 1h3m1 0h2m2 0h2m4 0h1m3 0h2m1 0h3m4 0h3m-29 1h3m1 0h1m1 0h2m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h5m-33 1h1m4 0h1m2 0h1m7 0h2m2 0h1m1 0h2m3 0h1m2 0h2m-28 1h4m1 0h1m1 0h1m2 0h7m2 0h1m2 0h2m3 0h1m-32 1h2m5 0h2m1 0h1m2 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h1m-30 1h4m1 0h6m2 0h1m1 0h8m3 0h1m1 0h2m-29 1h4m2 0h1m2 0h3m2 0h1m1 0h1m1 0h1m3 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m4 0h2m6 0h2m1 0h1m2 0h1m2 0h2m1 0h5m-30 1h3m1 0h1m4 0h1m8 0h5m3 0h1m1 0h1m1 0h1m1 0h1m-31 1h1m1 0h1m1 0h1m6 0h1m1 0h1m2 0h2m1 0h4m1 0h2m1 0h2m1 0h1m-30 1h2m2 0h3m1 0h1m1 0h4m1 0h3m1 0h2m2 0h1m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m1 0h1m1 0h1m5 0h1m3 0h1m1 0h1m2 0h1m-33 1h1m2 0h1m1 0h1m1 0h2m2 0h3m2 0h1m2 0h2m1 0h2m1 0h1m1 0h3m-30 1h1m1 0h6m2 0h5m2 0h1m5 0h1m1 0h3m3 0h2m-33 1h1m3 0h1m3 0h1m2 0h1m1 0h3m2 0h1m1 0h1m9 0h3m-33 1h3m3 0h1m2 0h1m3 0h5m1 0h2m1 0h1m1 0h6m1 0h1m-24 1h1m2 0h2m1 0h2m1 0h1m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m4 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h2m3 0h3m-31 1h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h4m1 0h1m1 0h7m3 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h2m2 0h5m1 0h1m1 0h1m1 0h2m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h2m1 0h3m2 0h3m2 0h1m1 0h1m1 0h2m2 0h2m-33 1h1m5 0h1m1 0h1m1 0h1m1 0h4m7 0h2m1 0h7m-33 1h7m4 0h1m1 0h1m3 0h2m4 0h3m1 0h2"/></svg></div></div>
+  <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div><div id="sc"><div id="st">SCANNERIZZA IL CODICE PER AVERE QUESTO ORARIO SUL TUO TELEFONINO</div><svg id="sq" shape-rendering="crispEdges" role="img" aria-label="QR code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path fill="#fff" d="M0 0h37v37h-37z"/><path stroke="#000" d="M2 2.5h7m3 0h4m1 0h1m5 0h2m3 0h7m-33 1h1m5 0h1m1 0h3m3 0h4m1 0h2m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m4 0h1m5 0h3m1 0h1m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h2m2 0h3m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m4 0h3m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m3 0h1m2 0h2m5 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h2m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m-22 1h1m1 0h4m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m5 0h2m1 0h2m1 0h1m-32 1h3m1 0h2m2 0h2m4 0h1m3 0h2m1 0h3m4 0h3m-29 1h3m1 0h1m1 0h2m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h5m-33 1h1m4 0h1m2 0h1m7 0h2m2 0h1m1 0h2m3 0h1m2 0h2m-28 1h4m1 0h1m1 0h1m2 0h7m2 0h1m2 0h2m3 0h1m-32 1h2m5 0h2m1 0h1m2 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h1m-30 1h4m1 0h6m2 0h1m1 0h8m3 0h1m1 0h2m-29 1h4m2 0h1m2 0h3m2 0h1m1 0h1m1 0h1m3 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m4 0h2m6 0h2m1 0h1m2 0h1m2 0h2m1 0h5m-30 1h3m1 0h1m4 0h1m8 0h5m3 0h1m1 0h1m1 0h1m1 0h1m-31 1h1m1 0h1m1 0h1m6 0h1m1 0h1m2 0h2m1 0h4m1 0h2m1 0h2m1 0h1m-30 1h2m2 0h3m1 0h1m1 0h4m1 0h3m1 0h2m2 0h1m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m1 0h1m1 0h1m5 0h1m3 0h1m1 0h1m2 0h1m-33 1h1m2 0h1m1 0h1m1 0h2m2 0h3m2 0h1m2 0h2m1 0h2m1 0h1m1 0h3m-30 1h1m1 0h6m2 0h5m2 0h1m5 0h1m1 0h3m3 0h2m-33 1h1m3 0h1m3 0h1m2 0h1m1 0h3m2 0h1m1 0h1m9 0h3m-33 1h3m3 0h1m2 0h1m3 0h5m1 0h2m1 0h1m1 0h6m1 0h1m-24 1h1m2 0h2m1 0h2m1 0h1m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m4 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h2m3 0h3m-31 1h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h4m1 0h1m1 0h7m3 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h2m2 0h5m1 0h1m1 0h1m1 0h2m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h2m1 0h3m2 0h3m2 0h1m1 0h1m1 0h2m2 0h2m-33 1h1m5 0h1m1 0h1m1 0h1m1 0h4m7 0h2m1 0h7m-33 1h7m4 0h1m1 0h1m3 0h2m4 0h3m1 0h2"/></svg></div></div>
 </section>
 <section id="clk">
 <svg viewBox="-107 -107 214 214" aria-label="Orologio analogico">
@@ -102,15 +103,31 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
     t.appendChild(l);
   }
   var H=document.getElementById('h'),M=document.getElementById('m'),S=document.getElementById('s');
-  function tick(){
+  /* modalita' lite (Raspberry/dispositivi lenti): ?lite forza, ?lite=0 disattiva, altrimenti automatica se < 24 fps */
+  var Q=location.search,lite=false,liteOff=/[?&]lite=0/.test(Q),last=0;
+  function setLite(v){lite=v;document.documentElement.classList.toggle('lite',v)}
+  if(/[?&]lite(=1|&|$)/.test(Q))setLite(true);
+  function tick(ts){
+    requestAnimationFrame(tick);
+    if(lite&&ts-last<66)return;
+    last=ts;
     var n=new Date(),s=n.getSeconds()+n.getMilliseconds()/1000;
     var m=n.getMinutes()+s/60;
     H.setAttribute('transform','rotate('+((n.getHours()%12+m/60)*30)+')');
     M.setAttribute('transform','rotate('+m*6+')');
     S.setAttribute('transform','rotate('+s*6+')');
-    requestAnimationFrame(tick);
   }
   tick();
+  if(!lite&&!liteOff){
+    var t0=0,fr=0,stop=false;
+    document.addEventListener('visibilitychange',function(){stop=true});
+    (function probe(ts){
+      if(stop)return;
+      if(!t0)t0=ts;fr++;
+      if(ts-t0<5000)return requestAnimationFrame(probe);
+      if(fr/((ts-t0)/1000)<24)setLite(true);
+    })(performance.now());
+  }
 
   /* ---- Rotazione lingue ogni 5 s ---- */
   var L=[['Partenze','Ora','Ritardo','Linea','Destinazione','Binario'],
