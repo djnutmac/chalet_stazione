@@ -39,7 +39,7 @@ h1 small{font-size:inherit;font-weight:800;transition:opacity .4s}
 @keyframes soonbus{0%,100%{background-color:#ffcc00}50%{background-color:#34c768}}
 .row.bus.soon{animation:soonbus 1.6s ease-in-out infinite}
 .row.soon{animation:soon 1.6s ease-in-out infinite}
-html.lite *{box-shadow:none!important}html.lite svg{filter:none!important}html.lite .row.soon{animation-timing-function:steps(1,end)}
+html.lite *{box-shadow:none!important}html.lite svg{filter:none!important}html.lite .row.soon{animation-timing-function:steps(1,end)}html.lite #hd>*,html.lite h1 small,html.lite #st{transition:none!important}html.lite #hd.fade>*,html.lite h1 small.fade,html.lite #st.fade{opacity:1!important}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
 #rows.stretch{display:flex;flex-direction:column}
 #rows.stretch>.row{box-sizing:border-box;flex:1 0 auto;max-height:calc(var(--u)*5.2)}
