@@ -51,10 +51,10 @@ html[data-tema=svizzera]{--bg:#d52b1e;--red:#d52b1e}
 .sp>svg{display:block;width:100%;height:100%;filter:none;animation:sway var(--sd) ease-in-out infinite alternate}
 .sp.k-cross>svg,.sp.k-pass>svg{animation-name:bob}
 .sp .wing{transform-box:fill-box;transform-origin:50% 100%;animation:flap .5s ease-in-out infinite alternate}
-@keyframes mv{from{transform:translate(var(--x0),var(--y0))}to{transform:translate(var(--x1),var(--y1))}}
-@keyframes mvp{0%{transform:translate(var(--x0),var(--y0))}65%,100%{transform:translate(var(--x1),var(--y1))}}
-@keyframes sway{from{transform:translateX(-1.1vw) rotate(-9deg)}to{transform:translateX(1.1vw) rotate(9deg)}}
-@keyframes bob{from{transform:translateY(-1.4vh) rotate(-4deg)}to{transform:translateY(1.4vh) rotate(4deg)}}
+@keyframes mv{0%{transform:translate(var(--x0),var(--y0))}50%{transform:translate(var(--xm),var(--ym))}100%{transform:translate(var(--x1),var(--y1))}}
+@keyframes mvp{0%{transform:translate(var(--x0),var(--y0))}32%{transform:translate(var(--xm),var(--ym))}65%,100%{transform:translate(var(--x1),var(--y1))}}
+@keyframes sway{from{transform:translateX(calc(var(--ax)*-1vw)) rotate(calc(var(--rot)*-1deg))}to{transform:translateX(calc(var(--ax)*1vw)) rotate(calc(var(--rot)*1deg))}}
+@keyframes bob{from{transform:translateY(calc(var(--ay)*-1vh)) rotate(calc(var(--rot)*-.5deg))}to{transform:translateY(calc(var(--ay)*1vh)) rotate(calc(var(--rot)*.5deg))}}
 @keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 html.lite .sp{animation-timing-function:steps(var(--st),end)}
 html.lite .sp>svg,html.lite .sp .wing{animation:none}
@@ -347,11 +347,12 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   /* k: fall (cade), rise (sale), cross (attraversa), pass (passa ogni tanto); w = larghezza in vw, ar = altezza/larghezza, d = durata in s, y = fascia verticale in vh */
   var T={
     normale:[],
-    halloween:[{s:pump,n:6,k:'cross',w:[4.6,6.2],ar:1,d:[34,56],y:[14,78]},{s:ghost,n:6,k:'cross',w:[4.4,6],ar:1,d:[34,56],y:[14,78]}],
-    natale:[{s:flake,n:24,k:'fall',w:[1.5,3.6],ar:1,d:[12,24]},{s:sleigh,n:1,k:'pass',w:[17,17],ar:110/290,d:[50,50],y:[0.5,1.5],once:1}],
-    pasqua:[{s:egg1,n:4,k:'fall',w:[3.8,6],ar:1,d:[16,28]},{s:egg2,n:4,k:'fall',w:[3.8,6],ar:1,d:[16,28]},{s:egg3,n:4,k:'fall',w:[3.8,6],ar:1,d:[16,28]},{s:dove,n:1,k:'pass',w:[10,10],ar:70/120,d:[44,44],y:[1,6],once:1}],
-    svizzera:[{s:flag,n:14,k:'rise',w:[3.6,6.5],ar:1,d:[16,30]}]
+    halloween:[{s:pump,n:5,k:'cross',w:[8,11.5],ar:1,d:[36,60]},{s:ghost,n:5,k:'cross',w:[7.5,11],ar:1,d:[36,60]}],
+    natale:[{s:flake,n:20,k:'fall',w:[2.6,6],ar:1,d:[12,24]},{s:sleigh,n:1,k:'pass',w:[26,26],ar:110/290,d:[54,54],once:1}],
+    pasqua:[{s:egg1,n:3,k:'fall',w:[6.5,10],ar:1,d:[16,28]},{s:egg2,n:3,k:'fall',w:[6.5,10],ar:1,d:[16,28]},{s:egg3,n:3,k:'fall',w:[6.5,10],ar:1,d:[16,28]},{s:dove,n:1,k:'pass',w:[17,17],ar:70/120,d:[48,48],once:1}],
+    svizzera:[{s:flag,n:11,k:'rise',w:[6,11],ar:1,d:[16,30]}]
   };
+
   var root=document.documentElement,bg=document.getElementById('bg'),cur=null,Q=location.search;
   var noAnim=/[?&]anim=0/.test(Q)||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
   var rnd=function(a,b){return a+Math.random()*(b-a)};
@@ -363,17 +364,19 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
       var n=o.once?o.n:Math.max(1,Math.round(o.n*f));
       for(var i=0;i<n;i++){
         var w=rnd(o.w[0],o.w[1]),dur=rnd(o.d[0],o.d[1]),x0,y0,x1,y1,dl;
-        /* le zone visibili sono la colonna dell'orologio (a destra) e le fasce sopra/sotto: li concentro li' */
-        var xs=function(){return Math.random()<.75?rnd(50,102):rnd(-3,50)};
-        if(o.k==='fall'){x0=xs();x1=x0+rnd(-8,8);y0=-18;y1=112;dl=-rnd(0,dur)}
-        else if(o.k==='rise'){x0=xs();x1=x0+rnd(-6,6);y0=112;y1=-22;dl=-rnd(0,dur)}
-        else{
-          x0=-26;x1=118;dl=o.k==='pass'?-rnd(0,dur*.25):-rnd(0,dur);
-          var r=Math.random();
-          y0=y1=(o.k==='pass')?rnd(o.y[0],o.y[1]):(r<.4?rnd(.3,2.2):r<.8?rnd(88,90.5):rnd(o.y[0],o.y[1]));
+        /* percorso casuale a 3 punti (partenza, tappa intermedia, arrivo): il 65% parte dalla colonna dell'orologio, dove si vede di piu' */
+        var xs=function(){return Math.random()<.65?rnd(50,102):rnd(-5,50)},xm,ym;
+        if(o.k==='fall'){x0=xs();xm=xs();x1=xs();y0=-30;ym=rnd(25,75);y1=118;dl=-rnd(0,dur)}
+        else if(o.k==='rise'){x0=xs();xm=xs();x1=xs();y0=118;ym=rnd(25,75);y1=-30;dl=-rnd(0,dur)}
+        else if(o.k==='cross'){
+          var rl=Math.random()<.5;
+          x0=rl?122:-30;x1=rl?-30:122;xm=rnd(20,85);
+          y0=rnd(2,86);ym=rnd(2,86);y1=rnd(2,86);dl=-rnd(0,dur);
+        }else{ /* pass: slitta e colomba volano verso destra su una linea ondulata in alto */
+          x0=-40;x1=125;xm=rnd(30,70);y0=rnd(0,6);ym=rnd(0,10);y1=rnd(0,6);dl=-rnd(0,dur*.25);
         }
-        var st=Math.max(8,Math.round(dur*7));
-        out.push('<div class="sp k-'+o.k+'" style="--w:'+w.toFixed(2)+';--h:'+(w*o.ar).toFixed(2)+';--dur:'+dur.toFixed(1)+'s;--dl:'+dl.toFixed(1)+'s;--sd:'+rnd(2.6,5).toFixed(1)+'s;--st:'+st+';--x0:'+x0.toFixed(1)+'vw;--x1:'+x1.toFixed(1)+'vw;--y0:'+y0.toFixed(1)+'vh;--y1:'+y1.toFixed(1)+'vh">'+o.s+'</div>');
+        var st=Math.max(6,Math.round(dur*(o.k==='pass'?2.4:3.5)));
+        out.push('<div class="sp k-'+o.k+'" style="--w:'+w.toFixed(2)+';--h:'+(w*o.ar).toFixed(2)+';--dur:'+dur.toFixed(1)+'s;--dl:'+dl.toFixed(1)+'s;--sd:'+rnd(2.6,5).toFixed(1)+'s;--st:'+st+';--ax:'+rnd(.8,2.4).toFixed(1)+';--ay:'+rnd(1,4).toFixed(1)+';--rot:'+rnd(4,14).toFixed(0)+';--x0:'+x0.toFixed(1)+'vw;--xm:'+xm.toFixed(1)+'vw;--x1:'+x1.toFixed(1)+'vw;--y0:'+y0.toFixed(1)+'vh;--ym:'+ym.toFixed(1)+'vh;--y1:'+y1.toFixed(1)+'vh">'+o.s+'</div>');
       }
     });
     bg.innerHTML=out.join('');
