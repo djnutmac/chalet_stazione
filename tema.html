@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="only light">
+<title>Tema del tabellone</title>
+<style>
+:root{color-scheme:only light;--ink:#1b1b1b;--dim:#555;--line:#d9d6d0;--red:#c6111a}
+*{box-sizing:border-box}
+body{margin:0;background:#eceae6;color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;line-height:1.4}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;margin:.2em 0 .1em}
+p.sub{margin:0 0 18px;color:var(--dim)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+h2{font-size:1.05rem;margin:0 0 10px}
+#cur{font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.t{appearance:none;font:inherit;text-align:left;cursor:pointer;background:#fff;border:3px solid var(--line);border-radius:10px;padding:0;overflow:hidden;color:var(--ink)}
+.t .sw{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-weight:800;color:#fff;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}
+.t .nm{padding:8px 10px;font-weight:700}
+.t .nm small{display:block;font-weight:400;color:var(--dim)}
+.t[aria-pressed=true]{border-color:#111;box-shadow:0 0 0 2px #fff inset}
+.t:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+.prev{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:8px;border:1px solid var(--line);background:#222}
+.prev iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;pointer-events:none}
+button.go{appearance:none;font:inherit;font-weight:800;border:0;border-radius:10px;padding:14px 20px;background:#111;color:#fff;cursor:pointer;width:100%;font-size:1.05rem}
+button.go:disabled{background:#999;cursor:not-allowed}
+button.sec{appearance:none;font:inherit;border:1px solid #aaa;background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+input[type=password]{font:inherit;width:100%;padding:10px;border:1px solid #aaa;border-radius:8px;margin:6px 0 8px}
+.row2{display:flex;gap:8px;flex-wrap:wrap}
+#msg{margin-top:12px;font-weight:700;min-height:1.4em}
+.ok{color:#146c2e}.err{color:#b00020}
+details{margin-top:10px;color:var(--dim)}
+details li{margin:.3em 0}
+code{background:#f1efea;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tema del tabellone</h1>
+  <p class="sub">Scegli il tema e premi «Applica». In uso adesso sul tabellone: <span id="cur">…</span></p>
+
+  <div class="card">
+    <h2>1. Scegli</h2>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Anteprima</h2>
+    <div class="prev" id="prev"><iframe id="fr" title="Anteprima"></iframe></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Applica</h2>
+    <button class="go" id="go" disabled>Applica al tabellone</button>
+    <div id="msg" role="status" aria-live="polite"></div>
+    <p style="margin:10px 0 0;color:var(--dim)">Il tabellone cambia da solo entro 3-5 minuti (GitHub deve pubblicare il file, poi il tabellone controlla ogni 2 minuti).</p>
+  </div>
+
+  <div class="card">
+    <h2>Accesso a GitHub (una volta sola per dispositivo)</h2>
+    <div id="tokOk" hidden>
+      <p style="margin:0 0 8px">Token salvato su questo dispositivo.</p>
+      <button class="sec" id="tokDel">Rimuovi token</button>
+    </div>
+    <div id="tokForm">
+      <label for="tok">Token GitHub</label>
+      <input type="password" id="tok" autocomplete="off" placeholder="github_pat_…">
+      <div class="row2"><button class="sec" id="tokSave">Salva token</button></div>
+    </div>
+    <details>
+      <summary>Come si crea il token</summary>
+      <ol>
+        <li>GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token.</li>
+        <li>Repository access: <b>Only select repositories</b> → <code>chalet_stazione</code>.</li>
+        <li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Nient'altro.</li>
+        <li>Scadenza a scelta (quando scade, ne crei uno nuovo). Copia il token e incollalo qui sopra.</li>
+      </ol>
+      <p>Il token resta solo nel browser di questo dispositivo e non viene scritto nel repository. Non condividere questa pagina con il token salvato su un dispositivo non tuo.</p>
+    </details>
+  </div>
+</main>
+
+<script>
+(function(){
+  var OWNER='djnutmac',REPO='chalet_stazione',PATH='tema.json';
+  var TEMI=[
+    {id:'normale',   nome:'Normale',   sub:'Rosso RhB',            bg:'#c6111a',deco:''},
+    {id:'halloween', nome:'Halloween', sub:'Arancio e viola',      bg:'#c2410c',deco:'🎃'},
+    {id:'natale',    nome:'Natale',    sub:'Rosso e verde',        bg:'#b0122a',deco:'🎄'},
+    {id:'pasqua',    nome:'Pasqua',    sub:'Viola e verde tenue',  bg:'#7e3fa8',deco:'🐣'},
+    {id:'svizzera',  nome:'Festa nazionale svizzera', sub:'1° agosto', bg:'#d52b1e',deco:'🇨🇭'}
+  ];
+  var $=function(i){return document.getElementById(i)};
+  var sel=null,live=null,grid=$('grid'),go=$('go'),msg=$('msg'),fr=$('fr'),prev=$('prev');
+
+  function nomeDi(id){for(var i=0;i<TEMI.length;i++)if(TEMI[i].id===id)return TEMI[i].nome;return id}
+  function say(t,c){msg.textContent=t;msg.className=c||''}
+  function token(){try{return localStorage.getItem('hbTok')||''}catch(e){return ''}}
+
+  TEMI.forEach(function(t){
+    var b=document.createElement('button');b.type='button';b.className='t';b.setAttribute('aria-pressed','false');b.dataset.id=t.id;
+    b.innerHTML='<div class="sw" style="background:'+t.bg+'"><span>Partenze</span><span aria-hidden="true">'+t.deco+'</span></div><div class="nm">'+t.nome+'<small>'+t.sub+'</small></div>';
+    b.addEventListener('click',function(){choose(t.id)});
+    grid.appendChild(b);
+  });
+
+  function choose(id){
+    sel=id;
+    [].forEach.call(grid.children,function(c){c.setAttribute('aria-pressed',String(c.dataset.id===id))});
+    fr.src='index.html?tema='+id;
+    refreshBtn();say('');
+  }
+  function refreshBtn(){
+    var has=!!token();
+    go.disabled=!sel||!has;
+    go.textContent=!has?'Prima salva il token (in fondo alla pagina)':(sel?'Applica «'+nomeDi(sel)+'» al tabellone':'Applica al tabellone');
+  }
+  function fit(){fr.style.transform='scale('+(prev.clientWidth/1920)+')'}
+  window.addEventListener('resize',fit);fit();
+
+  function showTok(){var h=!!token();$('tokOk').hidden=!h;$('tokForm').hidden=h;refreshBtn()}
+  $('tokSave').onclick=function(){
+    var v=$('tok').value.trim();
+    if(!/^(github_pat_|ghp_)[A-Za-z0-9_]+$/.test(v)){say('Il token non sembra valido: deve iniziare con github_pat_','err');return}
+    try{localStorage.setItem('hbTok',v)}catch(e){say('Questo browser non permette di salvare il token.','err');return}
+    $('tok').value='';say('Token salvato su questo dispositivo.','ok');showTok();
+  };
+  $('tokDel').onclick=function(){try{localStorage.removeItem('hbTok')}catch(e){}showTok();say('Token rimosso.','ok')};
+
+  function api(method,body){
+    return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+PATH,{
+      method:method,
+      headers:{'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},
+      body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  }
+  function explain(r){
+    if(r.status===401)return 'Token non valido o scaduto: creane uno nuovo.';
+    if(r.status===403)return 'Il token non ha il permesso «Contents: Read and write» su questo repository.';
+    if(r.status===404)return 'Repository o file non trovato (o token senza accesso al repository '+REPO+').';
+    if(r.status===409||r.status===422)return 'Conflitto: qualcuno ha modificato il file nel frattempo. Riprova.';
+    return 'Errore GitHub '+r.status+'.';
+  }
+  go.onclick=function(){
+    if(!sel||!token())return;
+    go.disabled=true;say('Salvataggio in corso…');
+    api('GET').then(function(r){
+      if(r.status===404)return null;               // file non ancora creato: lo creiamo
+      if(!r.ok)throw r;
+      return r.json().then(function(j){return j.sha});
+    }).then(function(sha){
+      var body={message:'Tema: '+sel,content:btoa(JSON.stringify({tema:sel})+'\n')};
+      if(sha)body.sha=sha;
+      return api('PUT',body);
+    }).then(function(r){
+      if(!r.ok)throw r;
+      say('Fatto: tema «'+nomeDi(sel)+'» inviato. Il tabellone lo mostrerà entro 3-5 minuti.','ok');
+    }).catch(function(r){
+      say(r&&r.status?explain(r):'Nessuna connessione a GitHub. Riprova.','err');
+    }).then(function(){refreshBtn()});
+  };
+
+  fetch('tema.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()})
+    .then(function(j){live=String(j.tema||'normale');$('cur').textContent=nomeDi(live);choose(live)})
+    .catch(function(){$('cur').textContent='Normale';choose('normale')});
+
+  showTok();
+})();
+</script>
+</body>
+</html>
