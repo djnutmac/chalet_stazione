@@ -32,9 +32,6 @@ input[type=password]{font:inherit;width:100%;padding:10px;border:1px solid #aaa;
 .row2{display:flex;gap:8px;flex-wrap:wrap}
 #msg{margin-top:12px;font-weight:700;min-height:1.4em}
 .ok{color:#146c2e}.err{color:#b00020}
-textarea{font:inherit;width:100%;padding:10px;border:1px solid #aaa;border-radius:8px;resize:vertical;line-height:1.35}
-.cnt{font-size:.85rem;color:var(--dim);margin:4px 0 8px}
-.chk{display:flex;gap:8px;align-items:flex-start}
 details{margin-top:10px;color:var(--dim)}
 details li{margin:.3em 0}
 code{background:#f1efea;padding:1px 5px;border-radius:4px}
@@ -51,22 +48,8 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
   </div>
 
   <div class="card">
-    <h2>2. Anteprima (mostra anche il menù che stai scrivendo)</h2>
+    <h2>2. Anteprima</h2>
     <div class="prev" id="prev"><iframe id="fr" title="Anteprima"></iframe></div>
-  </div>
-
-  <div class="card">
-    <h2>Menù del giorno</h2>
-    <p style="margin:0 0 8px;color:var(--dim)">Fino a 4 righe, un piatto per riga. Il testo si adatta da solo alla grandezza del box.</p>
-    <textarea id="mtx" rows="4" spellcheck="true" placeholder="Es.&#10;Pizzoccheri della Valtellina&#10;Capunsei con burro e salvia&#10;Tagliata di manzo con patate&#10;Torta di grano saraceno"></textarea>
-    <div class="cnt" id="mcnt">0 / 4 righe</div>
-    <label class="chk"><input type="checkbox" id="msolo" checked> Nascondi il menù a mezzanotte (mostra solo il giorno in cui lo salvi)</label>
-    <div class="row2" style="margin-top:10px">
-      <button class="go" id="msave" style="width:auto;flex:1" disabled>Salva menù</button>
-      <button class="sec" id="mclear" disabled>Svuota menù</button>
-    </div>
-    <div id="mmsg" role="status" aria-live="polite" style="margin-top:10px;font-weight:700;min-height:1.4em"></div>
-    <p style="margin:6px 0 0;color:var(--dim)" id="mlast"></p>
   </div>
 
   <div class="card">
@@ -127,7 +110,7 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
   function choose(id){
     sel=id;
     [].forEach.call(grid.children,function(c){c.setAttribute('aria-pressed',String(c.dataset.id===id))});
-    fr.src=(mtx?previewSrc():'index.html?tema='+id);
+    fr.src='index.html?tema='+id;
     refreshBtn();say('');
   }
   function refreshBtn(){
@@ -138,7 +121,7 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
   function fit(){fr.style.transform='scale('+(prev.clientWidth/1920)+')'}
   window.addEventListener('resize',fit);fit();
 
-  function showTok(){var h=!!token();$('tokOk').hidden=!h;$('tokForm').hidden=h;refreshBtn();if(mtx)mRefresh()}
+  function showTok(){var h=!!token();$('tokOk').hidden=!h;$('tokForm').hidden=h;refreshBtn()}
   $('tokSave').onclick=function(){
     var v=$('tok').value.trim();
     if(!/^(github_pat_|ghp_)[A-Za-z0-9_]+$/.test(v)){say('Il token non sembra valido: deve iniziare con github_pat_','err');return}
@@ -147,8 +130,8 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
   };
   $('tokDel').onclick=function(){try{localStorage.removeItem('hbTok')}catch(e){}showTok();say('Token rimosso.','ok')};
 
-  function api(method,body,path){
-    return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+(path||PATH),{
+  function api(method,body){
+    return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+PATH,{
       method:method,
       headers:{'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},
       body:body?JSON.stringify(body):undefined,cache:'no-store'});
@@ -184,50 +167,6 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
     .catch(function(){$('cur').textContent='Normale';choose('normale')});
 
   showTok();
-
-  /* ---------- Menù del giorno ---------- */
-  var mtx=$('mtx'),msave=$('msave'),mclear=$('mclear'),mmsg=$('mmsg'),MPATH='menu.json',mTimer=null;
-  function oggi(){var d=new Date(),z=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
-  function righeMenu(){return mtx.value.split('\n').map(function(x){return x.trim()}).filter(Boolean)}
-  function mSay(x,c){mmsg.textContent=x;mmsg.className=c||''}
-  function mRefresh(){
-    var n=righeMenu().length,has=!!token();
-    $('mcnt').textContent=n+' / 4 righe'+(n>4?' (le righe oltre la quarta non verranno mostrate)':'');
-    msave.disabled=!has||n===0;mclear.disabled=!has;
-  }
-  function previewSrc(){
-    var q='index.html?tema='+(sel||'normale'),r=righeMenu().slice(0,4);
-    if(r.length)q+='&menu='+encodeURIComponent(r.join('\n'));
-    return q;
-  }
-  function updatePreview(){if(sel)fr.src=previewSrc()}
-  mtx.addEventListener('input',function(){mRefresh();clearTimeout(mTimer);mTimer=setTimeout(updatePreview,500)});
-  function saveMenu(righe,label){
-    mSay('Salvataggio in corso…');msave.disabled=true;mclear.disabled=true;
-    api('GET',null,MPATH).then(function(r){
-      if(r.status===404)return null;
-      if(!r.ok)throw r;
-      return r.json().then(function(j){return j.sha});
-    }).then(function(sha){
-      var o={righe:righe.slice(0,4),data:oggi(),soloOggi:$('msolo').checked};
-      var body={message:'Menù: '+label,content:btoa(unescape(encodeURIComponent(JSON.stringify(o)+'\n')))};
-      if(sha)body.sha=sha;
-      return api('PUT',body,MPATH);
-    }).then(function(r){
-      if(!r.ok)throw r;
-      mSay(righe.length?'Fatto: menù inviato. Sul tabellone compare entro 3-5 minuti.':'Fatto: menù svuotato. Il box sparisce dal tabellone entro 3-5 minuti.','ok');
-      $('mlast').textContent=righe.length?'Salvato il '+new Date().toLocaleString('it-IT'):'';
-    }).catch(function(r){
-      mSay(r&&r.status?explain(r):'Nessuna connessione a GitHub. Riprova.','err');
-    }).then(mRefresh);
-  }
-  msave.onclick=function(){if(righeMenu().length)saveMenu(righeMenu(),'aggiornato')};
-  mclear.onclick=function(){mtx.value='';mRefresh();updatePreview();saveMenu([],'svuotato')};
-  fetch('menu.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()}).then(function(j){
-    if(Array.isArray(j.righe)&&j.righe.length){mtx.value=j.righe.join('\n');$('msolo').checked=j.soloOggi!==false;
-      $('mlast').textContent='Menù attualmente sul tabellone (salvato il '+j.data+').';updatePreview()}
-    mRefresh();
-  }).catch(function(){mRefresh()});
 })();
 </script>
 </body>
