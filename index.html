@@ -58,6 +58,14 @@ html[data-tema=svizzera]{--bg:#d52b1e;--red:#d52b1e}
 @keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 html.lite .sp{animation-timing-function:steps(var(--st),end)}
 html.lite .sp>svg,html.lite .sp .wing{animation:none}
+#moon{position:absolute;left:0;top:0;z-index:2;display:flex;align-items:flex-start;gap:.9vh;color:var(--bgtxt,#1b1b1b);pointer-events:none}
+#moon svg{width:8.6vh;height:8.6vh;flex:none;filter:none;display:block}
+#mnt{font-size:1.55vh;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.03em;max-width:12vh;padding-top:.5vh}
+#mnl{transition:opacity .4s;min-height:2.3em}
+#mnl.fade{opacity:0}
+#mnp{font-size:2.6vh;font-weight:800;letter-spacing:0;margin-top:.2vh}
+html.lite #mnl{transition:none!important}html.lite #mnl.fade{opacity:1!important}
+html[data-tema=halloween],html[data-tema=natale],html[data-tema=svizzera]{--bgtxt:#fff}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
 #rows.stretch{display:flex;flex-direction:column}
 #rows.stretch>.row{box-sizing:border-box;flex:1 0 auto;max-height:calc(var(--u)*5.2)}
@@ -83,13 +91,13 @@ html.lite .sp>svg,html.lite .sp .wing{animation:none}
 #clk svg{width:min(94cqh,100cqw);height:min(94cqh,100cqw)}
 #menu{flex:none;box-sizing:border-box;height:13vh;background:var(--panel);border:.6vmin solid var(--red);border-radius:1.2vmin;display:flex;flex-direction:column;align-items:stretch;overflow:hidden;color:var(--txt)}
 #menu[hidden]{display:none}
-#mt{flex:none;text-align:center;font-weight:800;color:#fff;background:var(--red);text-transform:uppercase;letter-spacing:.06em;line-height:1.2;padding:.28em 0;font-size:calc(var(--mh,137px)*.14)}
+#mt{flex:none;text-align:center;font-weight:800;color:#fff;background:var(--red);text-transform:uppercase;letter-spacing:.06em;line-height:1.2;padding:.28em 0;font-size:calc(var(--mh,137px)*.105)}
 #mb{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:.3vh 3%;overflow:hidden}
 #mx{display:block;max-width:100%;font-weight:700;line-height:1.18;white-space:pre-line;overflow-wrap:anywhere}
 
 svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(44vw,94dvh);filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
 .wi>svg{display:block;width:100%;height:100%;filter:none}
-@media (max-width:800px) and (orientation:portrait){body{grid-template-columns:1fr;grid-template-rows:auto auto;padding-top:calc(2vh + env(safe-area-inset-top,0px));height:auto;min-height:100%}#board{height:auto;min-height:60vh}#board>*{--u:1cqw;--cols:calc(var(--u)*12) calc(var(--u)*19) calc(var(--u)*16) 1fr calc(var(--u)*15)}svg{width:90vw;height:90vw}#rc{height:auto}#clk{flex:none}#clk{container-type:normal}#clk svg{width:90vw;height:90vw}#menu{height:auto;min-height:24vw}.row{font-size:calc(var(--u)*4.2)}.row.head{font-size:calc(var(--u)*2.7)}#ws{flex-direction:column;align-items:stretch;gap:calc(var(--u)*2)}#wg{grid-template-columns:repeat(2,minmax(0,1fr))}#sc{justify-content:flex-end}#st{width:auto;flex:1}}
+@media (max-width:800px) and (orientation:portrait){body{grid-template-columns:1fr;grid-template-rows:auto auto;padding-top:calc(2vh + env(safe-area-inset-top,0px));height:auto;min-height:100%}#board{height:auto;min-height:60vh}#board>*{--u:1cqw;--cols:calc(var(--u)*12) calc(var(--u)*19) calc(var(--u)*16) 1fr calc(var(--u)*15)}svg{width:90vw;height:90vw}#rc{height:auto}#moon{position:static;margin-bottom:1vh}#clk{flex:none}#clk{container-type:normal}#clk svg{width:90vw;height:90vw}#menu{height:auto;min-height:24vw}.row{font-size:calc(var(--u)*4.2)}.row.head{font-size:calc(var(--u)*2.7)}#ws{flex-direction:column;align-items:stretch;gap:calc(var(--u)*2)}#wg{grid-template-columns:repeat(2,minmax(0,1fr))}#sc{justify-content:flex-end}#st{width:auto;flex:1}}
 </style>
 </head>
 <body>
@@ -101,7 +109,7 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   <div id="rows"></div>
   <div id="ws"><div id="wx"><div id="wg"></div><div id="wcr">Meteo: Open-Meteo.com</div></div><div id="sc"><div id="st">SCANNERIZZA IL CODICE PER AVERE QUESTO ORARIO SUL TUO TELEFONINO</div><svg id="sq" shape-rendering="crispEdges" role="img" aria-label="QR code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path fill="#fff" d="M0 0h37v37h-37z"/><path stroke="#000" d="M2 2.5h7m3 0h4m1 0h1m5 0h2m3 0h7m-33 1h1m5 0h1m1 0h3m3 0h4m1 0h2m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m4 0h1m5 0h3m1 0h1m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h2m2 0h3m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m4 0h3m1 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m2 0h1m3 0h1m2 0h2m5 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h2m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m-22 1h1m1 0h4m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m5 0h2m1 0h2m1 0h1m-32 1h3m1 0h2m2 0h2m4 0h1m3 0h2m1 0h3m4 0h3m-29 1h3m1 0h1m1 0h2m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h5m-33 1h1m4 0h1m2 0h1m7 0h2m2 0h1m1 0h2m3 0h1m2 0h2m-28 1h4m1 0h1m1 0h1m2 0h7m2 0h1m2 0h2m3 0h1m-32 1h2m5 0h2m1 0h1m2 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h1m-30 1h4m1 0h6m2 0h1m1 0h8m3 0h1m1 0h2m-29 1h4m2 0h1m2 0h3m2 0h1m1 0h1m1 0h1m3 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m4 0h2m6 0h2m1 0h1m2 0h1m2 0h2m1 0h5m-30 1h3m1 0h1m4 0h1m8 0h5m3 0h1m1 0h1m1 0h1m1 0h1m-31 1h1m1 0h1m1 0h1m6 0h1m1 0h1m2 0h2m1 0h4m1 0h2m1 0h2m1 0h1m-30 1h2m2 0h3m1 0h1m1 0h4m1 0h3m1 0h2m2 0h1m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m1 0h1m1 0h1m5 0h1m3 0h1m1 0h1m2 0h1m-33 1h1m2 0h1m1 0h1m1 0h2m2 0h3m2 0h1m2 0h2m1 0h2m1 0h1m1 0h3m-30 1h1m1 0h6m2 0h5m2 0h1m5 0h1m1 0h3m3 0h2m-33 1h1m3 0h1m3 0h1m2 0h1m1 0h3m2 0h1m1 0h1m9 0h3m-33 1h3m3 0h1m2 0h1m3 0h5m1 0h2m1 0h1m1 0h6m1 0h1m-24 1h1m2 0h2m1 0h2m1 0h1m3 0h1m2 0h1m3 0h1m1 0h2m-32 1h7m4 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h2m3 0h3m-31 1h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h4m1 0h1m1 0h7m3 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h2m2 0h5m1 0h1m1 0h1m1 0h2m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h2m1 0h3m2 0h3m2 0h1m1 0h1m1 0h2m2 0h2m-33 1h1m5 0h1m1 0h1m1 0h1m1 0h4m7 0h2m1 0h7m-33 1h7m4 0h1m1 0h1m3 0h2m4 0h3m1 0h2"/></svg></div></div>
 </section>
-<div id="rc"><section id="clk">
+<div id="rc"><div id="moon" aria-hidden="true"><svg id="mn" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="mnc"><path id="mncp" d=""/></clipPath></defs><circle cx="22" cy="22" r="20" fill="#1e293b"/><g clip-path="url(#mnc)"><circle cx="22" cy="22" r="20" fill="#fef3c7"/><circle cx="15" cy="15" r="4.2" fill="#e6d79c" opacity=".7"/><circle cx="28" cy="20" r="3" fill="#e6d79c" opacity=".7"/><circle cx="19" cy="29" r="5" fill="#e6d79c" opacity=".6"/><circle cx="30" cy="31" r="2.2" fill="#e6d79c" opacity=".7"/></g><circle cx="22" cy="22" r="20" fill="none" stroke="#94a3b8" stroke-width="1"/></svg><div id="mnt"><div id="mnl"></div><div id="mnp"></div></div></div><section id="clk">
 <svg viewBox="-107 -107 214 214" aria-label="Orologio analogico">
   <circle r="106" style="fill:var(--ring,#1b1b1b)"/>
   <circle r="102" fill="#fff"/>
@@ -449,6 +457,37 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   }
   load();setInterval(load,2*60*1000);setInterval(render,60*1000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
+})();
+</script>
+<script>
+/* Fase lunare: calcolata qui (formule astronomiche semplificate), nessun servizio esterno. Errore tipico < 1 ora. */
+(function(){
+  var R=Math.PI/180,
+  NAMES=[['Luna nuova','Falce crescente','Primo quarto','Gibbosa crescente','Luna piena','Gibbosa calante','Ultimo quarto','Falce calante'],
+         ['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'],
+         ['Neumond','Zunehmende Sichel','Erstes Viertel','Zunehmender Mond','Vollmond','Abnehmender Mond','Letztes Viertel','Abnehmende Sichel']],
+  lang=0,idx=0,mnl=document.getElementById('mnl'),mnp=document.getElementById('mnp'),
+  p1=document.getElementById('mncp');
+  function elong(d){
+    var jd=d.getTime()/86400000+2440587.5,T=(jd-2451545)/36525,
+    Lm=218.3164477+481267.88123421*T,D=297.8501921+445267.1114034*T,M=357.5291092+35999.0502909*T,
+    Mm=134.9633964+477198.8675055*T,F=93.2720950+483202.0175233*T,
+    lm=Lm+6.288774*Math.sin(Mm*R)+1.274027*Math.sin((2*D-Mm)*R)+0.658314*Math.sin(2*D*R)+0.213618*Math.sin(2*Mm*R)-0.185116*Math.sin(M*R)-0.114332*Math.sin(2*F*R)+0.058793*Math.sin((2*D-2*Mm)*R)+0.057066*Math.sin((2*D-M-Mm)*R)+0.053322*Math.sin((2*D+Mm)*R)+0.045758*Math.sin((2*D-M)*R),
+    ls=280.46646+36000.76983*T+1.914602*Math.sin(M*R)+0.019993*Math.sin(2*M*R),
+    e=(lm-ls)%360;return e<0?e+360:e;
+  }
+  function update(){
+    var e=elong(new Date()),c=Math.cos(e*R),rx=(20*Math.abs(c)).toFixed(2),wax=e<180,
+        s1=wax?1:0,s2=wax?(c>0?0:1):(c>0?1:0);
+    p1.setAttribute('d','M22 2A20 20 0 0 '+s1+' 22 42A'+rx+' 20 0 0 '+s2+' 22 2Z');
+    mnp.textContent=Math.round((1-c)/2*100)+'%';
+    idx=(e<12||e>=348)?0:e<78?1:e<102?2:e<168?3:e<192?4:e<258?5:e<282?6:7; /* nuova/piena/quarti = circa 1 giorno, il resto falce o gibbosa */
+    mnl.textContent=NAMES[lang][idx];
+  }
+  /* il nome della fase ruota IT/EN/DE come le intestazioni */
+  document.addEventListener('mlout',function(){mnl.classList.add('fade')});
+  document.addEventListener('mlin',function(ev){lang=ev.detail;mnl.textContent=NAMES[lang][idx];mnl.classList.remove('fade')});
+  update();setInterval(update,10*60*1000);
 })();
 </script>
 </body>
