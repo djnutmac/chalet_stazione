@@ -58,12 +58,12 @@ html[data-tema=svizzera]{--bg:#d52b1e;--red:#d52b1e}
 @keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 html.lite .sp{animation-timing-function:steps(var(--st),end)}
 html.lite .sp>svg,html.lite .sp .wing{animation:none}
-#moon{position:absolute;left:0;top:0;z-index:2;display:flex;align-items:flex-start;gap:.9vh;color:var(--bgtxt,#1b1b1b);pointer-events:none}
-#moon svg{width:8.6vh;height:8.6vh;flex:none;filter:none;display:block}
-#mnt{font-size:1.55vh;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.03em;max-width:12vh;padding-top:.5vh}
+#moon{position:absolute;left:0;top:0;z-index:2;display:flex;align-items:flex-start;gap:1.1vh;color:var(--bgtxt,#1b1b1b);pointer-events:none}
+#moon svg{width:var(--m,11vh);height:var(--m,11vh);flex:none;filter:none;display:block}
+#mnt{font-size:calc(var(--m,11vh)*.15);line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.03em;max-width:calc(var(--m,11vh)*1.15);padding-top:calc(var(--m,11vh)*.04)}
 #mnl{transition:opacity .4s;min-height:2.3em}
 #mnl.fade{opacity:0}
-#mnp{font-size:2.6vh;font-weight:800;letter-spacing:0;margin-top:.2vh}
+#mnp{font-size:calc(var(--m,11vh)*.3);font-weight:800;letter-spacing:0;margin-top:calc(var(--m,11vh)*.03)}
 html.lite #mnl{transition:none!important}html.lite #mnl.fade{opacity:1!important}
 html[data-tema=halloween],html[data-tema=natale],html[data-tema=svizzera]{--bgtxt:#fff}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
@@ -487,6 +487,11 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   /* il nome della fase ruota IT/EN/DE come le intestazioni */
   document.addEventListener('mlout',function(){mnl.classList.add('fade')});
   document.addEventListener('mlin',function(ev){lang=ev.detail;mnl.textContent=NAMES[lang][idx];mnl.classList.remove('fade')});
+  /* grande quanto il QR della testata, che gli sta accanto */
+  var moon=document.getElementById('moon'),qr=document.getElementById('qr');
+  function size(){var w=qr&&qr.getBoundingClientRect().width;if(w>20)moon.style.setProperty('--m',Math.round(w)+'px')}
+  size();window.addEventListener('resize',size);
+  if(window.ResizeObserver&&qr)new ResizeObserver(size).observe(qr);
   update();setInterval(update,10*60*1000);
 })();
 </script>
