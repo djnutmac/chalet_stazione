@@ -58,12 +58,12 @@ html[data-tema=svizzera]{--bg:#d52b1e;--red:#d52b1e}
 @keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 html.lite .sp{animation-timing-function:steps(var(--st),end)}
 html.lite .sp>svg,html.lite .sp .wing{animation:none}
-#moon{position:absolute;left:0;top:0;z-index:2;display:flex;align-items:flex-start;gap:1.1vh;color:var(--bgtxt,#1b1b1b);pointer-events:none}
+#moon{position:absolute;left:calc(var(--ml,0px)*-1);top:0;z-index:2;display:flex;align-items:flex-start;gap:.8vh;color:var(--bgtxt,#1b1b1b);pointer-events:none}
 #moon svg{width:var(--m,11vh);height:var(--m,11vh);flex:none;filter:none;display:block}
-#mnt{font-size:calc(var(--m,11vh)*.15);line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.03em;max-width:calc(var(--m,11vh)*1.15);padding-top:calc(var(--m,11vh)*.04)}
+#mnt{font-size:calc(var(--m,11vh)*.15*var(--ts,1));line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.03em;max-width:calc(var(--m,11vh)*1.15);padding-top:calc(var(--m,11vh)*.04)}
 #mnl{transition:opacity .4s;min-height:2.3em}
 #mnl.fade{opacity:0}
-#mnp{font-size:calc(var(--m,11vh)*.3);font-weight:800;letter-spacing:0;margin-top:calc(var(--m,11vh)*.03)}
+#mnp{font-size:calc(var(--m,11vh)*.27*var(--ts,1));font-weight:800;letter-spacing:0;margin-top:calc(var(--m,11vh)*.03)}
 html.lite #mnl{transition:none!important}html.lite #mnl.fade{opacity:1!important}
 html[data-tema=halloween],html[data-tema=natale],html[data-tema=svizzera]{--bgtxt:#fff}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
@@ -483,15 +483,39 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
     mnp.textContent=Math.round((1-c)/2*100)+'%';
     idx=(e<12||e>=348)?0:e<78?1:e<102?2:e<168?3:e<192?4:e<258?5:e<282?6:7; /* nuova/piena/quarti = circa 1 giorno, il resto falce o gibbosa */
     mnl.textContent=NAMES[lang][idx];
+    if(typeof fitText==='function'&&clkSvg)fitText();
   }
   /* il nome della fase ruota IT/EN/DE come le intestazioni */
   document.addEventListener('mlout',function(){mnl.classList.add('fade')});
   document.addEventListener('mlin',function(ev){lang=ev.detail;mnl.textContent=NAMES[lang][idx];mnl.classList.remove('fade')});
-  /* grande quanto il QR della testata, che gli sta accanto */
-  var moon=document.getElementById('moon'),qr=document.getElementById('qr');
-  function size(){var w=qr&&qr.getBoundingClientRect().width;if(w>20)moon.style.setProperty('--m',Math.round(w)+'px')}
+  /* grande quanto il QR della testata, che gli sta accanto; spostata a sinistra quanto basta (verso il tabellone) per lasciare aria all'orologio */
+  var moon=document.getElementById('moon'),qr=document.getElementById('qr'),rc=document.getElementById('rc'),board=document.getElementById('board'),clkSvg=document.querySelector('#clk svg'),
+      portrait=function(){return window.matchMedia&&matchMedia('(max-width:800px) and (orientation:portrait)').matches};
+  function okTxt(cx,cy,r){
+    return [mnl,mnp].every(function(el){var g=document.createRange();g.selectNodeContents(el);var b=g.getBoundingClientRect(),dx=b.right-cx,dy=b.bottom-cy;return Math.sqrt(dx*dx+dy*dy)>r+16});
+  }
+  /* il testo non deve mai toccare il quadrante, a nessuna risoluzione e in nessuna lingua: se serve lo rimpicciolisco */
+  function fitText(){
+    if(portrait()){moon.style.setProperty('--ts',1);return}
+    var c=clkSvg.getBoundingClientRect();if(!c.width)return;
+    var cx=c.left+c.width/2,cy=c.top+c.height/2,r=c.width/2,keep=mnl.textContent,best=1;
+    NAMES.forEach(function(arr){
+      mnl.textContent=arr[idx];
+      var k=1;
+      for(;k>=.6;k-=.05){moon.style.setProperty('--ts',k.toFixed(2));if(okTxt(cx,cy,r))break}
+      best=Math.min(best,Math.max(k,.6));
+    });
+    mnl.textContent=keep;
+    moon.style.setProperty('--ts',best.toFixed(2));
+  }
+  function size(){
+    var w=qr&&qr.getBoundingClientRect().width;if(w>20)moon.style.setProperty('--m',Math.round(w)+'px');
+    var gap=rc.getBoundingClientRect().left-board.getBoundingClientRect().right;
+    moon.style.setProperty('--ml',portrait()?'0px':Math.max(0,Math.round(gap-10))+'px');
+    fitText();
+  }
   size();window.addEventListener('resize',size);
-  if(window.ResizeObserver&&qr)new ResizeObserver(size).observe(qr);
+  if(window.ResizeObserver){if(qr)new ResizeObserver(size).observe(qr);new ResizeObserver(fitText).observe(clkSvg)}
   update();setInterval(update,10*60*1000);
 })();
 </script>
