@@ -93,6 +93,8 @@ html[data-tema=halloween],html[data-tema=natale],html[data-tema=svizzera]{--bgtx
 #menu[hidden]{display:none}
 #mt{flex:none;text-align:center;font-weight:800;color:#fff;background:var(--red);text-transform:uppercase;letter-spacing:.06em;line-height:1.2;padding:.28em 0;font-size:calc(var(--mh,137px)*.105)}
 #mb{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:.3vh 3%;overflow:hidden}
+#mx .ln{display:block;white-space:nowrap}
+#mx svg.ic{display:inline-block;width:1.05em;height:1.05em;filter:none;vertical-align:-.17em;margin-right:.35em}
 #mx{display:block;max-width:100%;font-weight:700;line-height:1.18;white-space:pre-line;overflow-wrap:anywhere}
 
 svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(44vw,94dvh);filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
@@ -417,19 +419,44 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
 })();
 </script>
 <script>
-/* Menu del giorno: testo scritto in tema.html e salvato in menu.json (oppure provato con ?menu=...) */
+/* Menu: i testi sono scritti in tema.html e salvati in menu.json, una voce per giorno ({"menu":{"2026-10-28":[...]}}).
+   Regole (ora di Zurigo):
+   - fino alle 14 (cucina aperta): titolo "MENU DEL GIORNO" con il menu di oggi, anche se quello di domani e' gia' stato scritto;
+   - dalle 14: se esiste il menu di domani -> "MENU DI DOMANI" (subito, se viene scritto dopo le 14); altrimenti "Cucina chiusa / Pizza sempre disponibile";
+   - a mezzanotte il giorno cambia: il menu "di domani" diventa "del giorno"; se nessuno l'ha scritto il box si svuota.
+   Prove: ?menu=testo[&mt=d]  ?chiuso=1  ?ora=15 */
 (function(){
   var menu=document.getElementById('menu'),mt=document.getElementById('mt'),mb=document.getElementById('mb'),mx=document.getElementById('mx'),ws=document.getElementById('ws'),board=document.getElementById('board');
-  var data=null,Q=location.search,pm=/[?&]menu=([^&]*)/.exec(Q),portrait=function(){return window.matchMedia&&matchMedia('(max-width:800px) and (orientation:portrait)').matches};
-  function oggi(){var d=new Date(),z=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
-  function righe(){
-    if(pm){var t=''; try{t=decodeURIComponent(pm[1].replace(/\+/g,' '))}catch(e){} return t.split('\n').map(function(x){return x.trim()}).filter(Boolean).slice(0,4)}
-    if(!data||!Array.isArray(data.righe))return [];
-    if(data.soloOggi!==false&&data.data!==oggi())return [];
-    return data.righe.map(function(x){return String(x).trim()}).filter(Boolean).slice(0,4);
+  var data=null,last='',Q=location.search,pm=/[?&]menu=([^&]*)/.exec(Q),pd=/[?&]mt=d/.test(Q),pc=/[?&]chiuso=1/.test(Q),po=/[?&]ora=(\d+)/.exec(Q);
+  var portrait=function(){return window.matchMedia&&matchMedia('(max-width:800px) and (orientation:portrait)').matches};
+  var IC_CLOCK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="8" fill="#fff" stroke="#1b1b1b" stroke-width="2"/><path d="M12 8.5v5l3 2" stroke="#1b1b1b" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M3.8 5.5l3.2-2.6M20.2 5.5L17 2.9" style="stroke:var(--red)" stroke-width="2.6" stroke-linecap="round"/></svg>';
+  var IC_PIZZA='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22.5L2.8 5.6Q12 1 21.2 5.6z" fill="#f5b83d" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round"/><path d="M2.8 5.6Q12 1 21.2 5.6" stroke="#b45309" stroke-width="3.2" fill="none" stroke-linecap="round"/><circle cx="9" cy="10" r="1.8" fill="#dc2626"/><circle cx="14.5" cy="9.2" r="1.8" fill="#dc2626"/><circle cx="12" cy="15" r="1.6" fill="#dc2626"/></svg>';
+  var CHIUSO='<span class="ln">'+IC_CLOCK+'Cucina chiusa dalle 14:00</span><span class="ln">'+IC_PIZZA+'Pizza sempre disponibile</span>';
+  var fmt=null;try{fmt=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'})}catch(e){}
+  function adesso(){
+    var d=new Date(),day,h;
+    if(fmt){var p={};fmt.formatToParts(d).forEach(function(x){p[x.type]=x.value});day=p.year+'-'+p.month+'-'+p.day;h=parseInt(p.hour,10)%24}
+    else{var z=function(n){return(n<10?'0':'')+n};day=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());h=d.getHours()}
+    if(po)h=parseInt(po[1],10);
+    return{day:day,h:h};
+  }
+  function piuUno(g){var a=g.split('-');return new Date(Date.UTC(+a[0],+a[1]-1,+a[2]+1)).toISOString().slice(0,10)}
+  function pulisci(a){return Array.isArray(a)?a.map(function(x){return String(x).trim()}).filter(Boolean).slice(0,4):[]}
+  function mappa(){
+    if(data&&data.menu&&typeof data.menu==='object')return data.menu;
+    var m={};if(data&&Array.isArray(data.righe)&&data.data)m[data.data]=data.righe;return m; /* vecchio formato */
+  }
+  function stato(){
+    if(pc)return{t:'MENÙ DEL GIORNO',chiuso:true};
+    if(pm){var t='';try{t=decodeURIComponent(pm[1].replace(/\+/g,' '))}catch(e){}
+      return{t:pd?'MENÙ DI DOMANI':'MENÙ DEL GIORNO',rows:pulisci(t.split('\n'))}}
+    var z=adesso(),m=mappa(),dom=pulisci(m[piuUno(z.day)]);
+    /* prima delle 14 la cucina e' aperta: resta il menu di oggi anche se quello di domani e' gia' stato scritto */
+    if(z.h<14)return{t:'MENÙ DEL GIORNO',rows:pulisci(m[z.day])};
+    if(dom.length)return{t:'MENÙ DI DOMANI',rows:dom};
+    return{t:'MENÙ DEL GIORNO',chiuso:true};
   }
   function fit(){
-    if(menu.hidden)return;
     var h;
     if(portrait()){h=Math.max(120,menu.getBoundingClientRect().width*.3)}
     else{ /* alto quanto il box del meteo (fino al bordo inferiore del tabellone) */
@@ -442,21 +469,25 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
       if(mx.offsetHeight<=mb.clientHeight&&mx.scrollWidth<=mb.clientWidth)lo=mid;else hi=mid-1}
     mx.style.fontSize=lo+'px';
   }
-  function render(){
-    var r=righe();
-    mx.textContent=r.join('\n');
-    menu.hidden=!r.length;
-    if(r.length)fit();
+  function render(force){
+    var s=stato(),k=s.t+'|'+(s.chiuso?'C':(s.rows||[]).join('\n'));
+    if(k===last&&!force)return;
+    last=k;
+    mt.textContent=s.t;
+    if(s.chiuso)mx.innerHTML=CHIUSO;else mx.textContent=(s.rows||[]).join('\n');
+    menu.hidden=false;
+    fit();
   }
-  window.addEventListener('resize',fit);
-  if(window.ResizeObserver){new ResizeObserver(fit).observe(ws)}
-  if(pm){render();return}
+  window.addEventListener('resize',function(){fit()});
+  if(window.ResizeObserver){new ResizeObserver(function(){fit()}).observe(ws)}
+  render(true);
+  if(pm||pc)return;
   function load(){
     fetch('menu.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()})
       .then(function(j){data=j;render()}).catch(function(){});
   }
-  load();setInterval(load,2*60*1000);setInterval(render,60*1000);
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
+  load();setInterval(load,2*60*1000);setInterval(render,30*1000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){load();render()}});
 })();
 </script>
 <script>

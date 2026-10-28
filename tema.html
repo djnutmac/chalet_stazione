@@ -35,6 +35,15 @@ input[type=password]{font:inherit;width:100%;padding:10px;border:1px solid #aaa;
 textarea{font:inherit;width:100%;padding:10px;border:1px solid #aaa;border-radius:8px;resize:vertical;line-height:1.35}
 .cnt{font-size:.85rem;color:var(--dim);margin:4px 0 8px}
 .chk{display:flex;gap:8px;align-items:flex-start}
+.mcard{padding-top:0;overflow:hidden}
+.mh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 -16px 12px;padding:12px 16px;color:#fff}
+.mh .big{font-size:1.35rem;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.mh .dt{font-weight:700;opacity:.95}
+.mh.oggi{background:#146c2e}.mh.domani{background:#1d4ed8}
+.how{margin:0 0 10px;color:var(--dim)}
+.msg{margin-top:10px;font-weight:700;min-height:1.4em}
+.last{margin:6px 0 0;color:var(--dim)}
+button.go.b-oggi:not(:disabled){background:#146c2e}button.go.b-domani:not(:disabled){background:#1d4ed8}
 details{margin-top:10px;color:var(--dim)}
 details li{margin:.3em 0}
 code{background:#f1efea;padding:1px 5px;border-radius:4px}
@@ -52,21 +61,34 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
 
   <div class="card">
     <h2>2. Anteprima (mostra anche il menù che stai scrivendo)</h2>
+    <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="pchiuso"> Mostra com'è dopo le 14:00 (cucina chiusa)</label>
     <div class="prev" id="prev"><iframe id="fr" title="Anteprima"></iframe></div>
   </div>
 
-  <div class="card">
-    <h2>Menù del giorno</h2>
-    <p style="margin:0 0 8px;color:var(--dim)">Fino a 4 righe, un piatto per riga. Il testo si adatta da solo alla grandezza del box.</p>
+  <div class="card mcard">
+    <div class="mh oggi"><span class="big">Menù di OGGI</span><span class="dt" id="dtOggi"></span></div>
+    <p class="how">Scrivilo qui <b>solo se ieri non hai inserito il menù di domani</b>. Sul tabellone compare con il titolo «MENÙ DEL GIORNO» fino alle 14:00; dalle 14:00 il tabellone mostra da solo «Cucina chiusa dalle 14:00 · Pizza sempre disponibile».</p>
     <textarea id="mtx" rows="4" spellcheck="true" placeholder="Es.&#10;Pizzoccheri della Valtellina&#10;Capunsei con burro e salvia&#10;Tagliata di manzo con patate&#10;Torta di grano saraceno"></textarea>
     <div class="cnt" id="mcnt">0 / 4 righe</div>
-    <label class="chk"><input type="checkbox" id="msolo" checked> Nascondi il menù a mezzanotte (mostra solo il giorno in cui lo salvi)</label>
-    <div class="row2" style="margin-top:10px">
-      <button class="go" id="msave" style="width:auto;flex:1" disabled>Salva menù</button>
-      <button class="sec" id="mclear" disabled>Svuota menù</button>
+    <div class="row2">
+      <button class="go b-oggi" id="msave" style="width:auto;flex:1" disabled>Salva menù di OGGI</button>
+      <button class="sec" id="mclear" disabled>Svuota</button>
     </div>
-    <div id="mmsg" role="status" aria-live="polite" style="margin-top:10px;font-weight:700;min-height:1.4em"></div>
-    <p style="margin:6px 0 0;color:var(--dim)" id="mlast"></p>
+    <div id="mmsg" class="msg" role="status" aria-live="polite"></div>
+    <p class="last" id="mlast"></p>
+  </div>
+
+  <div class="card mcard">
+    <div class="mh domani"><span class="big">Menù di DOMANI</span><span class="dt" id="dtDomani"></span></div>
+    <p class="how">Scrivilo qui quando vuoi preparare il giorno dopo. <b>Se lo salvi prima delle 14:00</b> il tabellone continua a mostrare il menù di oggi (la cucina è aperta) e <b>dalle 14:00</b> passa a «MENÙ DI DOMANI»; <b>se lo salvi dopo le 14:00</b> passa subito. <b>A mezzanotte</b> il titolo torna «MENÙ DEL GIORNO» con lo stesso testo. Se non lo scrivi, a mezzanotte il box si svuota.</p>
+    <textarea id="mty" rows="4" spellcheck="true" placeholder="Es.&#10;Polenta e brasato&#10;Pizzoccheri&#10;Spezzatino con funghi&#10;Strudel di mele"></textarea>
+    <div class="cnt" id="mcnt2">0 / 4 righe</div>
+    <div class="row2">
+      <button class="go b-domani" id="msave2" style="width:auto;flex:1" disabled>Salva menù di DOMANI</button>
+      <button class="sec" id="mclear2" disabled>Svuota</button>
+    </div>
+    <div id="mmsg2" class="msg" role="status" aria-live="polite"></div>
+    <p class="last" id="mlast2"></p>
   </div>
 
   <div class="card">
@@ -185,48 +207,83 @@ code{background:#f1efea;padding:1px 5px;border-radius:4px}
 
   showTok();
 
-  /* ---------- Menù del giorno ---------- */
-  var mtx=$('mtx'),msave=$('msave'),mclear=$('mclear'),mmsg=$('mmsg'),MPATH='menu.json',mTimer=null;
-  function oggi(){var d=new Date(),z=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
-  function righeMenu(){return mtx.value.split('\n').map(function(x){return x.trim()}).filter(Boolean)}
-  function mSay(x,c){mmsg.textContent=x;mmsg.className=c||''}
+  /* ---------- Menù (oggi / domani): salvati in menu.json, una voce per giorno ---------- */
+  var mtx=$('mtx'),mty=$('mty'),mTimer=null,active='oggi',MPATH='menu.json';
+  var zf=null;try{zf=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit'})}catch(e){}
+  function giornoZ(){
+    if(zf){var p={};zf.formatToParts(new Date()).forEach(function(x){p[x.type]=x.value});return p.year+'-'+p.month+'-'+p.day}
+    var d=new Date(),z=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());
+  }
+  function oraZ(){try{var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Zurich',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(function(x){return x.type==='hour'})[0];return parseInt(p.value,10)%24}catch(e){return new Date().getHours()}}
+  function piuUno(g){var a=g.split('-');return new Date(Date.UTC(+a[0],+a[1]-1,+a[2]+1)).toISOString().slice(0,10)}
+  function bella(g){var a=g.split('-');return new Date(Date.UTC(+a[0],+a[1]-1,+a[2],12)).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}
+  function righe(ta){return ta.value.split('\n').map(function(x){return x.trim()}).filter(Boolean)}
+  function mappaDa(j){
+    if(j&&j.menu&&typeof j.menu==='object')return j.menu;
+    var m={};if(j&&Array.isArray(j.righe)&&j.data)m[j.data]=j.righe;return m; /* vecchio formato */
+  }
+  function riempiDate(){var g=giornoZ();$('dtOggi').textContent=bella(g);$('dtDomani').textContent=bella(piuUno(g))}
   function mRefresh(){
-    var n=righeMenu().length,has=!!token();
-    $('mcnt').textContent=n+' / 4 righe'+(n>4?' (le righe oltre la quarta non verranno mostrate)':'');
-    msave.disabled=!has||n===0;mclear.disabled=!has;
+    var has=!!token(),n1=righe(mtx).length,n2=righe(mty).length,tx=function(n){return n+' / 4 righe'+(n>4?' (le righe oltre la quarta non verranno mostrate)':'')};
+    $('mcnt').textContent=tx(n1);$('mcnt2').textContent=tx(n2);
+    $('msave').disabled=!has||n1===0;$('mclear').disabled=!has;
+    $('msave2').disabled=!has||n2===0;$('mclear2').disabled=!has;
   }
   function previewSrc(){
-    var q='index.html?tema='+(sel||'normale'),r=righeMenu().slice(0,4);
-    if(r.length)q+='&menu='+encodeURIComponent(r.join('\n'));
+    var q='index.html?tema='+(sel||'normale'),dom=active==='domani',r=righe(dom?mty:mtx).slice(0,4);
+    if(r.length)q+='&menu='+encodeURIComponent(r.join('\n'))+(dom?'&mt=d':'');
+    if($('pchiuso').checked)q+='&chiuso=1';
     return q;
   }
   function updatePreview(){if(sel)fr.src=previewSrc()}
-  mtx.addEventListener('input',function(){mRefresh();clearTimeout(mTimer);mTimer=setTimeout(updatePreview,500)});
-  function saveMenu(righe,label){
-    mSay('Salvataggio in corso…');msave.disabled=true;mclear.disabled=true;
-    api('GET',null,MPATH).then(function(r){
-      if(r.status===404)return null;
+  function attiva(quale){active=quale;updatePreview()}
+  [[mtx,'oggi'],[mty,'domani']].forEach(function(c){
+    c[0].addEventListener('input',function(){active=c[1];mRefresh();clearTimeout(mTimer);mTimer=setTimeout(updatePreview,500)});
+    c[0].addEventListener('focus',function(){if(active!==c[1])attiva(c[1])});
+  });
+  $('pchiuso').addEventListener('change',updatePreview);
+
+  function leggiAttuale(){
+    return api('GET',null,MPATH).then(function(r){
+      if(r.status===404)return{sha:null,map:{}};
       if(!r.ok)throw r;
-      return r.json().then(function(j){return j.sha});
-    }).then(function(sha){
-      var o={righe:righe.slice(0,4),data:oggi(),soloOggi:$('msolo').checked};
-      var body={message:'Menù: '+label,content:btoa(unescape(encodeURIComponent(JSON.stringify(o)+'\n')))};
-      if(sha)body.sha=sha;
+      return r.json().then(function(j){var map={};
+        try{map=mappaDa(JSON.parse(decodeURIComponent(escape(atob(String(j.content).replace(/\n/g,''))))))}catch(e){}
+        return{sha:j.sha,map:map}});
+    });
+  }
+  function salva(quale,rr){
+    var g=giornoZ(),chiave=quale==='domani'?piuUno(g):g,el=quale==='domani'?$('mmsg2'):$('mmsg'),last=quale==='domani'?$('mlast2'):$('mlast');
+    var say2=function(x,c){el.textContent=x;el.className='msg '+(c||'')};
+    say2('Salvataggio in corso…');
+    ['msave','mclear','msave2','mclear2'].forEach(function(i){$(i).disabled=true});
+    leggiAttuale().then(function(cur){
+      var map=cur.map;
+      if(rr.length)map[chiave]=rr.slice(0,4);else delete map[chiave];
+      Object.keys(map).forEach(function(k){if(k<g)delete map[k]}); /* tolgo i giorni passati */
+      var body={message:'Menù '+quale+': '+(rr.length?'aggiornato':'svuotato'),content:btoa(unescape(encodeURIComponent(JSON.stringify({menu:map})+'\n')))};
+      if(cur.sha)body.sha=cur.sha;
       return api('PUT',body,MPATH);
     }).then(function(r){
       if(!r.ok)throw r;
-      mSay(righe.length?'Fatto: menù inviato. Sul tabellone compare entro 3-5 minuti.':'Fatto: menù svuotato. Il box sparisce dal tabellone entro 3-5 minuti.','ok');
-      $('mlast').textContent=righe.length?'Salvato il '+new Date().toLocaleString('it-IT'):'';
+      if(quale==='domani')say2(rr.length?(oraZ()<14?'Fatto: salvato. Sul tabellone resta il menù di oggi fino alle 14:00, poi compare «MENÙ DI DOMANI».':'Fatto: sul tabellone compare «MENÙ DI DOMANI» entro 3-5 minuti.'):'Fatto: menù di domani tolto. Il tabellone torna al menù di oggi entro 3-5 minuti.','ok');
+      else say2(rr.length?'Fatto: menù di oggi inviato. Sul tabellone compare entro 3-5 minuti.':'Fatto: menù di oggi svuotato.','ok');
+      last.textContent=rr.length?'Salvato il '+new Date().toLocaleString('it-IT')+' (per '+bella(chiave)+').':'';
     }).catch(function(r){
-      mSay(r&&r.status?explain(r):'Nessuna connessione a GitHub. Riprova.','err');
+      say2(r&&r.status?explain(r):'Nessuna connessione a GitHub. Riprova.','err');
     }).then(mRefresh);
   }
-  msave.onclick=function(){if(righeMenu().length)saveMenu(righeMenu(),'aggiornato')};
-  mclear.onclick=function(){mtx.value='';mRefresh();updatePreview();saveMenu([],'svuotato')};
+  $('msave').onclick=function(){if(righe(mtx).length)salva('oggi',righe(mtx))};
+  $('mclear').onclick=function(){mtx.value='';mRefresh();updatePreview();salva('oggi',[])};
+  $('msave2').onclick=function(){if(righe(mty).length)salva('domani',righe(mty))};
+  $('mclear2').onclick=function(){mty.value='';mRefresh();updatePreview();salva('domani',[])};
+
+  riempiDate();mRefresh();
   fetch('menu.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()}).then(function(j){
-    if(Array.isArray(j.righe)&&j.righe.length){mtx.value=j.righe.join('\n');$('msolo').checked=j.soloOggi!==false;
-      $('mlast').textContent='Menù attualmente sul tabellone (salvato il '+j.data+').';updatePreview()}
-    mRefresh();
+    var m=mappaDa(j),g=giornoZ(),o=m[g],d=m[piuUno(g)];
+    if(Array.isArray(o)&&o.length){mtx.value=o.join('\n');$('mlast').textContent='Questo è il menù di oggi salvato sul tabellone.'}
+    if(Array.isArray(d)&&d.length){mty.value=d.join('\n');$('mlast2').textContent='Questo è il menù di domani salvato sul tabellone.'}
+    mRefresh();updatePreview();
   }).catch(function(){mRefresh()});
 })();
 </script>
