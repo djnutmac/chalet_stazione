@@ -66,6 +66,8 @@ html.lite .sp>svg,html.lite .sp .wing{animation:none}
 #mnp{font-size:calc(var(--m,11vh)*.27*var(--ts,1));font-weight:800;letter-spacing:0;margin-top:calc(var(--m,11vh)*.03)}
 html.lite #mnl{transition:none!important}html.lite #mnl.fade{opacity:1!important}
 html[data-tema=halloween],html[data-tema=natale],html[data-tema=svizzera]{--bgtxt:#fff}
+#cimg,#pa,#pb,#phr{transition:opacity .9s ease}
+html.lite #cimg,html.lite #pa,html.lite #pb,html.lite #phr{transition:none}
 @media (prefers-reduced-motion:reduce){.row.soon{animation:none;background-color:#80e39a}.row.bus.soon{animation:none;background-color:#34c768}}
 #rows.stretch{display:flex;flex-direction:column}
 #rows.stretch>.row{box-sizing:border-box;flex:1 0 auto;max-height:calc(var(--u)*5.2)}
@@ -118,6 +120,9 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   <circle r="106" style="fill:var(--ring,#1b1b1b)"/>
   <circle r="102" fill="#fff"/>
   <image id="cimg" x="-69" y="-74" width="138" height="148" opacity=".66" preserveAspectRatio="xMidYMid meet"/>
+  <defs><clipPath id="phc"><circle r="76"/></clipPath></defs>
+  <g id="ph" clip-path="url(#phc)"><image id="pa" x="-76" y="-76" width="152" height="152" opacity="0" preserveAspectRatio="xMidYMid slice"/><image id="pb" x="-76" y="-76" width="152" height="152" opacity="0" preserveAspectRatio="xMidYMid slice"/></g>
+  <circle id="phr" r="76" fill="none" stroke="#cfcac0" stroke-width="1.2" opacity="0"/>
   <g id="ticks" stroke="#111"></g>
   <g id="h"><rect x="-4.5" y="-55" width="9" height="78" rx="1" fill="#111"/></g>
   <g id="m"><rect x="-3.2" y="-84" width="6.4" height="106" rx="1" fill="#111"/></g>
@@ -559,6 +564,57 @@ svg{width:min(44vw,94vh);height:min(44vw,94vh);width:min(44vw,94dvh);height:min(
   size();window.addEventListener('resize',size);
   if(window.ResizeObserver){if(qr)new ResizeObserver(size).observe(qr);new ResizeObserver(fitText).observe(clkSvg)}
   update();setInterval(update,10*60*1000);
+})();
+</script>
+<script>
+/* Slideshow nel quadrante: logo + foto della cartella foto/ del repository (elenco letto da GitHub, ordine alfabetico).
+   Cambia ogni 15 s (multiplo del giro delle lingue, ogni 5 s); ?foto=NN cambia i secondi, ?foto=0 lo spegne. Con ?lite il cambio e' di colpo. */
+(function(){
+  var Q=location.search,mq=/[?&]foto=(\d+)/.exec(Q),sec=mq?parseInt(mq[1],10):15;
+  if(!sec)return;
+  sec=Math.max(5,Math.round(sec/5)*5);
+  var every=sec/5,REPO='djnutmac/chalet_stazione',DIR='foto',OPA=.88,KEY='hbFoto';
+  var logo=document.getElementById('cimg'),ring=document.getElementById('phr'),front=document.getElementById('pa'),back=document.getElementById('pb');
+  var list=[],idx=-1,ticks=0,busy=false;
+  try{list=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){list=[]}
+  function leggi(){
+    fetch('https://api.github.com/repos/'+REPO+'/contents/'+DIR,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'})
+      .then(function(r){if(r.status===404)return[];if(!r.ok)throw 0;return r.json()})
+      .then(function(a){
+        if(!Array.isArray(a))return;
+        list=a.filter(function(f){return f.type==='file'&&/\.(jpe?g|png|webp|avif|gif)$/i.test(f.name)})
+              .map(function(f){return f.name}).sort(function(x,y){return x.localeCompare(y,'it',{numeric:true,sensitivity:'base'})});
+        try{localStorage.setItem(KEY,JSON.stringify(list))}catch(e){}
+        if(idx>=list.length)idx=-1;
+      }).catch(function(){}); /* offline o limite GitHub: resta l'ultimo elenco noto */
+  }
+  function mostraLogo(){
+    front.style.opacity=0;back.style.opacity=0;ring.style.opacity=0;logo.style.opacity='';
+  }
+  function mostra(url){
+    var t=front;front=back;back=t;      /* "front" e' ora lo strato libero */
+    front.setAttribute('href',url);
+    front.style.opacity=OPA;back.style.opacity=0;logo.style.opacity=0;ring.style.opacity=1;
+  }
+  function prossima(){
+    if(busy)return;
+    if(!list.length){if(idx!==-1){idx=-1;mostraLogo()}return}
+    var n=idx+1;
+    if(n>=list.length){idx=-1;mostraLogo();return} /* dopo l'ultima foto torna il logo */
+    var nome=list[n],url=DIR+'/'+encodeURIComponent(nome),img=new Image();
+    busy=true;
+    img.onload=function(){
+      var go=function(){idx=n;busy=false;mostra(url)};
+      if(img.decode)img.decode().then(go,go);else go();
+    };
+    img.onerror=function(){ /* foto mancante o rotta: la salto */
+      busy=false;list.splice(n,1);if(idx>=list.length)idx=-1;
+    };
+    img.src=url;
+  }
+  document.addEventListener('mlin',function(){ticks++;if(ticks%every===0)prossima()});
+  leggi();setInterval(leggi,30*60*1000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)leggi()});
 })();
 </script>
 </body>
